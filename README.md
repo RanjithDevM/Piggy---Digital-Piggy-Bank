@@ -3,6 +3,8 @@
 Piggy is a digital piggy bank prototype designed to encourage smarter saving habits.  
 Instead of showing your balance every time, Piggy hides it until you reach your savings goal — helping you avoid unnecessary spending and stay motivated.
 
+⚠️ **Note:** This is only a prototype of my idea. If you find any mistakes or issues, please let me know so I can correct them.  
+
 ---
 
 ## ✨ Features
