@@ -27,5 +27,3 @@ Instead of showing your balance every time, Piggy hides it until you reach your 
 - 🎨 Multiple themes for better UI/UX  
 
 ---
-
-## 📂 Project Structure
