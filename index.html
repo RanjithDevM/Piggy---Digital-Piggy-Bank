@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piggy - Secret Savings</title>
+          <link rel="icon" type="image/png" href="pig.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #4A90E2, #357ABD);
+            --success-gradient: linear-gradient(135deg, #27AE60, #219A52);
+            --warning-gradient: linear-gradient(135deg, #f39c12, #e67e22);
+            --danger-gradient: linear-gradient(135deg, #e74c3c, #c0392b);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.37);
+            --shadow-heavy: 0 20px 40px rgba(0,0,0,0.15);
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%);
+            z-index: -1;
+            animation: floating 20s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(2deg); }
+        }
+
+        .app-container {
+            background: rgba(21, 21, 21, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--shadow-heavy);
+            overflow: hidden;
+            width: 100%;
+            max-width: 800px;
+            min-height: 600px;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .header {
+            background: var(--secondary-gradient);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .lock-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .app-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .app-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .reset-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            transform: rotate(90deg) scale(1.1);
+            background: rgba(255,255,255,0.2);
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .form-section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--secondary-gradient);
+            margin-right: 12px;
+            border-radius: 2px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input {
+            width: 100%;
+            padding: 18px 20px;
+            border: 2px solid #e8ecef;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #e6e6e9;
+            color: var(--text-primary);
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: #4A90E2;
+            background: rgb(19, 19, 19);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(74, 144, 226, 0.15);
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+
+        .primary-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--secondary-gradient);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .primary-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .primary-btn:hover::before {
+            left: 100%;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(74, 144, 226, 0.4);
+        }
+
+        .primary-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .goal-container {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 32px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .goal-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .goal-amount {
+            font-size: 42px;
+            font-weight: 800;
+            margin: 16px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hidden-container {
+            text-align: center;
+            padding: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .eye-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            animation: blink 3s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 90%, 100% { opacity: 1; }
+            95% { opacity: 0.3; }
+        }
+
+        .hidden-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .progress-container {
+            margin: 24px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffffff, #f1c40f, #ffffff);
+            border-radius: 6px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+            animation: progressShimmer 2s infinite;
+        }
+
+        @keyframes progressShimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .progress-text {
+            font-size: 16px;
+            opacity: 0.95;
+            font-weight: 600;
+        }
+
+        .reveal-container {
+            text-align: center;
+            padding: 24px;
+            animation: revealAnimation 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes revealAnimation {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .balance-amount {
+            font-size: 48px;
+            font-weight: 800;
+            color: #2ecc71;
+            margin: 20px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .success-text {
+            font-size: 20px;
+            color: #27ae60;
+            font-weight: 700;
+            margin: 20px 0;
+        }
+
+        .withdraw-btn {
+            background: var(--success-gradient);
+            color: white;
+            border: none;
+            padding: 18px 36px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .withdraw-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(39, 174, 96, 0.4);
+        }
+
+        .deposit-container {
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            padding: 28px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .deposit-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .amount-input {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .quick-amounts {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .quick-btn {
+            padding: 14px 8px;
+            background: white;
+            border: 2px solid #4A90E2;
+            color: #4A90E2;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: #4A90E2;
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .quick-btn:hover::before {
+            left: 0;
+        }
+
+        .quick-btn:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.3);
+        }
+
+        .bank-info {
+            background: linear-gradient(135deg, #e8f4fd, #ffffff);
+            padding: 20px;
+            border-radius: 16px;
+            border-left: 4px solid #4A90E2;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .bank-info-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .bank-info-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .welcome-text {
+            font-size: 18px;
+            color: white;
+            margin-bottom: 12px;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .loading-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 500px;
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #e0e0e0;
+            border-top: 4px solid #4A90E2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 24px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 18px;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .loading-subtext {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Stats Section */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid #f0f0f0;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .app-container {
+                margin: 16px;
+                border-radius: 20px;
+                max-width: none;
+            }
+            
+            .content {
+                padding: 24px 20px;
+            }
+            
+            .header {
+                padding: 32px 20px;
+            }
+            
+            .goal-amount {
+                font-size: 32px;
+            }
+            
+            .balance-amount {
+                font-size: 36px;
+            }
+
+            .quick-amounts {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .app-title {
+                font-size: 24px;
+            }
+            
+            .section-title {
+                font-size: 16px;
+            }
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 16px 20px;
+            max-width: 300px;
+            z-index: 1000;
+            animation: slideInRight 0.5s ease;
+        }
+
+        .notification.success {
+            border-left: 4px solid #27ae60;
+        }
+
+        .notification.error {
+            border-left: 4px solid #e74c3c;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .app-container {
+                background: rgba(30, 30, 30, 0.95);
+                color: #ffffff;
+            }
+            
+            .input {
+                background: #2c2c2c;
+                color: #ffffff;
+                border-color: #404040;
+            }
+            
+            .deposit-container {
+                background: linear-gradient(135deg, #2c2c2c, #1a1a1a);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Loading Screen -->
+        <div id="loadingScreen" class="loading-screen">
+            <div class="spinner"></div>
+            <p class="loading-text">Loading your secret savings...</p>
+            <p class="loading-subtext">Securing your financial future</p>
+        </div>
+
+        <!-- Onboarding Screen -->
+        <div id="onboardingScreen" class="hidden">
+            <div class="header">
+                <div class="lock-icon">🐷</div>
+                <h1 class="app-title">Piggy</h1>
+                <p class="app-subtitle">Your Secret Savings Companion</p>
+            </div>
+            
+            <div class="content">
+                <div class="form-section">
+                    <h3 class="section-title">Personal Information</h3>
+                    <div class="input-group">
+                        <input type="text" id="userName" class="input" placeholder="Full Name" required>
+                        <div class="input-icon">👤</div>
+                    </div>
+                    <div class="input-group">
+                        <input type="email" id="userEmail" class="input" placeholder="Email Address" required>
+                        <div class="input-icon">📧</div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Bank Details</h3>
+                    <div class="input-group">
+                        <input type="text" id="bankName" class="input" placeholder="Bank Name" required>
+                        <div class="input-icon">🏦</div>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="accountNumber" class="input" placeholder="Account Number" required>
+                        <div class="input-icon">🔢</div>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="routingNumber" class="input" placeholder="IFSC Code" required>
+                        <div class="input-icon">📋</div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Savings Goal</h3>
+                    <div class="input-group">
+                        <input type="number" id="targetAmount" class="input" placeholder="Target Amount (₹)" min="1" required>
+                        <div class="input-icon">🎯</div>
+                    </div>
+                    <div class="input-group">
+                        <input type="date" id="targetDate" class="input" required>
+                        <div class="input-icon">📅</div>
+                    </div>
+                </div>
+
+                <button class="primary-btn" onclick="setupAccount()">Start Secret Savings Journey</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboardScreen" class="hidden">
+            <div class="header">
+                <button class="reset-btn" onclick="resetApp()" title="Reset App">🔄</button>
+                <p class="welcome-text" id="welcomeMessage">Welcome back!</p>
+                <div class="lock-icon">🐷</div>
+            </div>
+
+            <div class="content">
+                <!-- Statistics -->
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalDeposits">0</div>
+                        <div class="stat-label">Deposits</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="daysActive">0</div>
+                        <div class="stat-label">Days Active</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgDeposit">₹0</div>
+                        <div class="stat-label">Avg Deposit</div>
+                    </div>
+                </div>
+
+                <div class="goal-container">
+                    <p>Savings Goal</p>
+                    <div class="goal-amount" id="goalAmount">₹0</div>
+                    <p style="opacity: 0.8; font-size: 14px;" id="targetDateText">Target: Not set</p>
+                    
+                    <div id="hiddenBalanceView">
+                        <div class="hidden-container">
+                            <div class="eye-icon">👁️‍🗨️</div>
+                            <p class="hidden-text">Balance Hidden</p>
+                            <p style="font-size: 14px; opacity: 0.8;">Keep saving to reach your goal!</p>
+                            
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                                </div>
+                                <p class="progress-text" id="progressText">0% Complete</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="revealBalanceView" class="hidden">
+                        <div class="reveal-container">
+                            <div class="eye-icon">🎉</div>
+                            <p>Current Balance</p>
+                            <div class="balance-amount" id="currentBalance">₹0.00</div>
+                            <p class="success-text">🎉 Goal Achieved!</p>
+                            <button class="withdraw-btn" onclick="withdrawFunds()">Withdraw Funds</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="deposit-container">
+                    <h3 class="deposit-title">💰 Add to Savings</h3>
+                    <input type="number" id="depositAmount" class="input amount-input" placeholder="Enter amount" min="0.01" step="0.01">
+                    
+                    <div class="quick-amounts">
+                        <button class="quick-btn" onclick="setQuickAmount(10)">₹10</button>
+                        <button class="quick-btn" onclick="setQuickAmount(50)">₹50</button>
+                        <button class="quick-btn" onclick="setQuickAmount(100)">₹100</button>
+                        <button class="quick-btn" onclick="setQuickAmount(500)">₹500</button>
+                    </div>
+                    
+                    <button class="primary-btn" onclick="addDeposit()">Add Deposit</button>
+                </div>
+
+                <div class="bank-info">
+                    <p class="bank-info-title">🏦 Linked Account</p>
+                    <p class="bank-info-text" id="bankDetails">No account linked</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application state
+        let appData = {
+            userData: null,
+            currentBalance: 0,
+            targetAmount: 0,
+            targetDate: null,
+            showBalance: false,
+            transactions: [],
+            setupDate: null
+        };
+
+        // Initialize app
+        window.addEventListener('load', function() {
+            // Set minimum target date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('targetDate').min = tomorrow.toISOString().split('T')[0];
+            
+            setTimeout(() => {
+                loadAppData();
+            }, 2000); // Show loading screen for 2 seconds
+        });
+
+        // Notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div style="font-weight: 600; margin-bottom: 4px;">${type === 'success' ? '✅' : '❌'} ${type === 'success' ? 'Success' : 'Error'}</div>
+                <div style="font-size: 14px; color: #666;">${message}</div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideInRight 0.5s ease reverse';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 500);
+            }, 3000);
+        }
+
+        // Load saved data from memory (localStorage removed for compatibility)
+        function loadAppData() {
+            try {
+                // For demo purposes, we'll use in-memory storage
+                if (appData.userData) {
+                    showDashboard();
+                } else {
+                    showOnboarding();
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showOnboarding();
+            }
+        }
+
+        // Show onboarding screen
+        function showOnboarding() {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('onboardingScreen').classList.remove('hidden');
+            document.getElementById('dashboardScreen').classList.add('hidden');
+        }
+
+        // Show dashboard screen
+        function showDashboard() {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('onboardingScreen').classList.add('hidden');
+            document.getElementById('dashboardScreen').classList.remove('hidden');
+            
+            updateDashboard();
+        }
+
+        // Setup new account
+        function setupAccount() {
+            const userName = document.getElementById('userName').value.trim();
+            const userEmail = document.getElementById('userEmail').value.trim();
+            const bankName = document.getElementById('bankName').value.trim();
+            const accountNumber = document.getElementById('accountNumber').value.trim();
+            const routingNumber = document.getElementById('routingNumber').value.trim();
+            const targetAmount = parseFloat(document.getElementById('targetAmount').value);
+            const targetDate = document.getElementById('targetDate').value;
+
+            // Validation
+            if (!userName || !userEmail || !bankName || !accountNumber || !routingNumber || !targetAmount || !targetDate) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (targetAmount <= 0) {
+                showNotification('Target amount must be greater than 0', 'error');
+                return;
+            }
+
+            if (!isValidEmail(userEmail)) {
+                showNotification('Please enter a valid email address', 'error');
+                return;
+            }
+
+            try {
+                const userData = {
+                    name: userName,
+                    email: userEmail,
+                    bankName: bankName,
+                    accountNumber: accountNumber,
+                    routingNumber: routingNumber,
+                    setupDate: new Date().toISOString()
+                };
+
+                appData.userData = userData;
+                appData.targetAmount = targetAmount;
+                appData.targetDate = targetDate;
+                appData.currentBalance = 0;
+                appData.showBalance = false;
+                appData.transactions = [];
+                appData.setupDate = new Date();
+
+                showNotification('Your secret savings account is now set up!');
+                setTimeout(() => showDashboard(), 1000);
+            } catch (error) {
+                showNotification('Failed to save your information', 'error');
+            }
+        }
+
+        // Email validation
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Update dashboard display
+        function updateDashboard() {
+            document.getElementById('welcomeMessage').textContent = `Welcome back, ${appData.userData.name}!`;
+            document.getElementById('goalAmount').textContent = `₹${appData.targetAmount.toLocaleString()}`;
+            
+            // Update target date
+            if (appData.targetDate) {
+                const targetDate = new Date(appData.targetDate);
+                document.getElementById('targetDateText').textContent = `Target: ${targetDate.toLocaleDateString()}`;
+            }
+            
+            // Update bank details
+            const bankDetails = `${appData.userData.bankName} ****${appData.userData.accountNumber.slice(-4)}`;
+            document.getElementById('bankDetails').textContent = bankDetails;
+
+            // Update statistics
+            updateStatistics();
+
+            if (appData.showBalance) {
+                document.getElementById('hiddenBalanceView').classList.add('hidden');
+                document.getElementById('revealBalanceView').classList.remove('hidden');
+                document.getElementById('currentBalance').textContent = `₹${appData.currentBalance.toLocaleString()}`;
+            } else {
+                document.getElementById('hiddenBalanceView').classList.remove('hidden');
+                document.getElementById('revealBalanceView').classList.add('hidden');
+                
+                // Update progress
+                const progressPercentage = (appData.currentBalance / appData.targetAmount) * 100;
+                const clampedProgress = Math.min(progressPercentage, 100);
+                
+                document.getElementById('progressFill').style.width = `${clampedProgress}%`;
+                document.getElementById('progressText').textContent = `${clampedProgress.toFixed(1)}% Complete`;
+            }
+        }
+
+        // Update statistics
+        function updateStatistics() {
+            const totalDeposits = appData.transactions.length;
+            const daysActive = appData.setupDate ? Math.floor((new Date() - appData.setupDate) / (1000 * 60 * 60 * 24)) + 1 : 0;
+            const avgDeposit = totalDeposits > 0 ? appData.currentBalance / totalDeposits : 0;
+
+            document.getElementById('totalDeposits').textContent = totalDeposits;
+            document.getElementById('daysActive').textContent = daysActive;
+            document.getElementById('avgDeposit').textContent = `₹${avgDeposit.toFixed(0)}`;
+        }
+
+        // Set quick amount
+        function setQuickAmount(amount) {
+            document.getElementById('depositAmount').value = amount;
+            // Add a subtle animation to show the amount was set
+            const input = document.getElementById('depositAmount');
+            input.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                input.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        // Add deposit
+        function addDeposit() {
+            const depositAmount = parseFloat(document.getElementById('depositAmount').value);
+            
+            if (!depositAmount || depositAmount <= 0) {
+                showNotification('Please enter a valid amount', 'error');
+                return;
+            }
+
+            if (depositAmount > 100000) {
+                showNotification('Maximum deposit amount is ₹1,00,000', 'error');
+                return;
+            }
+
+            try {
+                appData.currentBalance += depositAmount;
+                
+                // Add transaction record
+                appData.transactions.push({
+                    type: 'deposit',
+                    amount: depositAmount,
+                    date: new Date().toISOString(),
+                    balance: appData.currentBalance
+                });
+                
+                document.getElementById('depositAmount').value = '';
+
+                // Check if target is reached
+                if (appData.currentBalance >= appData.targetAmount && !appData.showBalance) {
+                    appData.showBalance = true;
+                    
+                    setTimeout(() => {
+                        showNotification(`Congratulations! You've reached your savings target of ₹${appData.targetAmount.toLocaleString()}! You can now view your balance and withdraw funds.`);
+                        updateDashboard();
+                    }, 100);
+                } else {
+                    showNotification(`₹${depositAmount.toLocaleString()} added to your secret savings!`);
+                }
+                
+                updateDashboard();
+            } catch (error) {
+                showNotification('Failed to add deposit', 'error');
+            }
+        }
+
+        // Withdraw funds
+        function withdrawFunds() {
+            const confirmWithdraw = confirm(`Are you sure you want to withdraw ₹${appData.currentBalance.toLocaleString()}?`);
+            
+            if (confirmWithdraw) {
+                const withdrawalAmount = appData.currentBalance;
+                const bankInfo = `${appData.userData.bankName} ****${appData.userData.accountNumber.slice(-4)}`;
+                
+                // Add withdrawal transaction
+                appData.transactions.push({
+                    type: 'withdrawal',
+                    amount: withdrawalAmount,
+                    date: new Date().toISOString(),
+                    balance: 0
+                });
+                
+                showNotification(`Withdrawal Successful! ₹${withdrawalAmount.toLocaleString()} has been sent to your bank account: ${bankInfo}`);
+                
+                // Reset savings but keep user data
+                appData.currentBalance = 0;
+                appData.showBalance = false;
+                appData.setupDate = new Date(); // Reset start date
+                
+                setTimeout(() => updateDashboard(), 1000);
+            }
+        }
+
+        // Reset app
+        function resetApp() {
+            const confirmReset = confirm('This will delete all data. Are you sure?');
+            
+            if (confirmReset) {
+                appData = {
+                    userData: null,
+                    currentBalance: 0,
+                    targetAmount: 0,
+                    targetDate: null,
+                    showBalance: false,
+                    transactions: [],
+                    setupDate: null
+                };
+                showNotification('App has been reset successfully');
+                setTimeout(() => showOnboarding(), 1000);
+            }
+        }
+
+        // Auto-save progress (simulated)
+        setInterval(() => {
+            if (appData.userData) {
+                // In a real app, this would save to a backend
+                console.log('Auto-saving progress...');
+            }
+        }, 30000); // Auto-save every 30 seconds
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            // Ctrl/Cmd + D for quick deposit
+            if ((event.ctrlKey || event.metaKey) && event.key === 'd') {
+                event.preventDefault();
+                document.getElementById('depositAmount').focus();
+            }
+            
+            // Enter key to add deposit when amount input is focused
+            if (event.key === 'Enter' && document.activeElement.id === 'depositAmount') {
+                addDeposit();
+            }
+        });
+
+        // Add motivational messages
+        const motivationalMessages = [
+            "Every rupee saved is a step towards your goal!",
+            "You're doing great! Keep up the savings momentum!",
+            "Small savings, big dreams! You've got this!",
+            "Your future self will thank you for saving today!",
+            "Consistency is key to financial success!"
+        ];
+
+        function getMotivationalMessage() {
+            return motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)];
+        }
+
+        // Show motivational message periodically
+        let motivationTimer;
+        function startMotivationTimer() {
+            if (motivationTimer) clearInterval(motivationTimer);
+            
+            motivationTimer = setInterval(() => {
+                if (appData.userData && !appData.showBalance) {
+                    showNotification(getMotivationalMessage());
+                }
+            }, 120000); // Show every 2 minutes
+        }
+
+        // Start motivation timer when dashboard is shown
+        const originalShowDashboard = showDashboard;
+        showDashboard = function() {
+            originalShowDashboard();
+            startMotivationTimer();
+        };
+
+        // Add currency formatting
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Enhanced progress calculation with time factor
+        function getTimeProgress() {
+            if (!appData.targetDate) return 0;
+            
+            const now = new Date();
+            const target = new Date(appData.targetDate);
+            const start = appData.setupDate || now;
+            
+            const totalTime = target - start;
+            const elapsed = now - start;
+            
+            return Math.max(0, Math.min(100, (elapsed / totalTime) * 100));
+        }
+    </script>
+</body>
+</html>
